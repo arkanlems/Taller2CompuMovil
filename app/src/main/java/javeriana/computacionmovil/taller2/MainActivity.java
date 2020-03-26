@@ -2,6 +2,7 @@ package javeriana.computacionmovil.taller2;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
@@ -20,55 +21,78 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
 
     private static final String MainActivity = "MainActivity";
-    private static final int REQUEST= 112;
-    Context mContext = this;
+    private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;
+    public Context thisActivity = this;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences settings = getSharedPreferences(MainActivity, 0);
-        HashMap<String, String> map = (HashMap<String, String>) settings.getAll();
+
 
 
         ImageButton botonContactos = findViewById(R.id.BotonContactos);
         botonContactos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String[] PERMISSIONS = {Manifest.permission.READ_CONTACTS,
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                };
-                if (!hasPermissions(mContext, PERMISSIONS)) {
-                    Log.d("TAG", "@@@ IN IF hasPermissions");
-                    ActivityCompat.requestPermissions((Activity) mContext, PERMISSIONS, REQUEST);
-                } else {
-                    Log.d("TAG", "@@@ IN ELSE hasPermissions");
-                    callNextActivity();
-                }
-
-                Log.d("TAG", "@@@ IN ELSE  Build.VERSION.SDK_INT >= 23");
-                callNextActivity();
-
+                requestPermissionContacts(MainActivity.this,"Contactos","por que si",0);
             }
         });
     }
-    private static boolean hasPermissions(Context context, String... permissions) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        callNextActivity();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
                 }
+                return;
             }
+
+            // other 'case' lines to check for other
+            // permissions this app might request.
         }
-        return true;
     }
+
+    public void requestPermissionContacts(Activity context, String permiso, String justificacion, int idCode){
+
+        if (ContextCompat.checkSelfPermission(context,
+                Manifest.permission.READ_CONTACTS)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Permission is not granted
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(context,
+                    Manifest.permission.READ_CONTACTS)) {
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+            } else {
+                // No explanation needed; request the permission
+                ActivityCompat.requestPermissions(context,
+                        new String[]{Manifest.permission.READ_CONTACTS},
+                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        } else {
+            // Permission has already been granted
+        }
+
+    }
+
+
+
     public void callNextActivity()
     {
         Intent ss = new Intent(MainActivity.this, Contactos.class);
-        ss.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        ss.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        ss.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        ss.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
         startActivity(ss);
         finish();
     }
