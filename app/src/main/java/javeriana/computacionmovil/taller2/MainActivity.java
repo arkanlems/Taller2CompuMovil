@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import java.util.HashMap;
 
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String MainActivity = "MainActivity";
     private static final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;
+    private static final int MY_PERMISSIONS_REQUEST_MAP =1 ;
     public Context thisActivity = this;
 
     @Override
@@ -36,7 +38,18 @@ public class MainActivity extends AppCompatActivity {
         botonContactos.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                requestPermissionContacts(MainActivity.this,"Contactos","por que si",0);
+                requestPermissionContacts(MainActivity.this,"Contactos","para poder visulizar sus contactos " +
+                        "debe otrogar este permiso",0);
+            }
+          });
+
+        ImageButton botonCamara = findViewById(R.id.BotonCamara);
+        botonCamara.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(v.getContext(), Camara.class);
+                startActivity(i);
+                finish();
             }
         });
     }
@@ -61,31 +74,43 @@ public class MainActivity extends AppCompatActivity {
 
     public void requestPermissionContacts(Activity context, String permiso, String justificacion, int idCode){
 
-        if (ContextCompat.checkSelfPermission(context,
-                Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
+        switch (permiso) {
+            case "Contactos":
+            if (ContextCompat.checkSelfPermission(context,
+                    Manifest.permission.READ_CONTACTS)
+                    != PackageManager.PERMISSION_GRANTED) {
 
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(context,
-                    Manifest.permission.READ_CONTACTS)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
+                // Permission is not granted
+                // Should we show an explanation?
+                Toast.makeText(MainActivity.this,
+                                justificacion,
+                                Toast.LENGTH_SHORT).show();
+                if (ActivityCompat.shouldShowRequestPermissionRationale(context,
+                        Manifest.permission.READ_CONTACTS)) {
+
+                    // Show an explanation to the user *asynchronously* -- don't block
+                    // this thread waiting for the user's response! After the user
+                    // sees the explanation, try again to request the permission.
+                    Toast.makeText(MainActivity.this,
+                            justificacion,
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    // No explanation needed; request the permission
+                    ActivityCompat.requestPermissions(context,
+                            new String[]{Manifest.permission.READ_CONTACTS},
+                            MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+
+                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                    // app-defined int constant. The callback method gets the
+                    // result of the request.
+                }
             } else {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(context,
-                        new String[]{Manifest.permission.READ_CONTACTS},
-                        MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
+                // Permission has already been granted
+                callNextActivity();
             }
-        } else {
-            // Permission has already been granted
-        }
+            case "Mapa":
 
+        }
     }
 
 
