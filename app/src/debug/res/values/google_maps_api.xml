@@ -9,7 +9,7 @@
     You can also add your credentials to an existing key, using these values:
 
     Package name:
-    80:7A:D1:78:98:37:6F:76:C6:FC:09:40:04:9A:F9:67:4F:AB:0B:17
+    javeriana.computacionmovil.taller2
 
     SHA-1 certificate fingerprint:
     80:7A:D1:78:98:37:6F:76:C6:FC:09:40:04:9A:F9:67:4F:AB:0B:17
@@ -20,5 +20,5 @@
     Once you have your key (it starts with "AIza"), replace the "google_maps_key"
     string in this file.
     -->
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">YOUR_KEY_HERE</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyAj1BVaYeVOG7n2jfZ6A7W7wUBvBjKz-Cs</string>
 </resources>

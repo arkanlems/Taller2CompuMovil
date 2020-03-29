@@ -32,12 +32,19 @@ public class Contactos extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contactos);
-        mlista = (ListView) findViewById(R.id.list);
-        mProjection = new String[]{ ContactsContract.Profile._ID, ContactsContract.Profile.DISPLAY_NAME_PRIMARY, };
+
+        mlista = (ListView) findViewById(R.id.listView);
+
+        requestPermissionContacts(Contactos.this,"contactos","para poder visulizar sus contactos " +
+                "debe otrogar este permiso",0);
+        mProjection = new String[]
+                {
+                ContactsContract.Profile._ID,
+                ContactsContract.Profile.DISPLAY_NAME_PRIMARY,
+        };
         mContactsAdapter = new ContactsAdapter(this, null, 0);
         mlista.setAdapter(mContactsAdapter);
-        requestPermissionContacts(Contactos.this,"Contactos","para poder visulizar sus contactos " +
-                "debe otrogar este permiso",0);
+
 
 
     }
@@ -49,10 +56,11 @@ public class Contactos extends AppCompatActivity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     initView();
                 } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    Intent i = new Intent(Contactos.this,MainActivity.class);
+                    startActivity(i);
+                    finish();
                 }
-                return;
+               
             }
                    // other 'case' lines to check for other
             // permissions this app might request.
@@ -60,43 +68,22 @@ public class Contactos extends AppCompatActivity {
     }
     public void requestPermissionContacts(Activity context, String permiso, String justificacion, int idCode){
 
-        switch (permiso) {
-            case "Contactos":
-                if (ContextCompat.checkSelfPermission(context,
-                        Manifest.permission.READ_CONTACTS)
-                        != PackageManager.PERMISSION_GRANTED) {
 
-                    // Permission is not granted
-                    // Should we show an explanation?
-                    Toast.makeText(context,
-                            justificacion,
-                            Toast.LENGTH_SHORT).show();
+                if (ContextCompat.checkSelfPermission(context,Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+
                     if (ActivityCompat.shouldShowRequestPermissionRationale(context,
                             Manifest.permission.READ_CONTACTS)) {
-
-                        // Show an explanation to the user *asynchronously* -- don't block
-                        // this thread waiting for the user's response! After the user
-                        // sees the explanation, try again to request the permission.
-                        Toast.makeText(context,
-                                justificacion,
+                                Toast.makeText(context,
+                                justificacion + permiso ,
                                 Toast.LENGTH_SHORT).show();
                     } else {
-                        // No explanation needed; request the permission
-                        ActivityCompat.requestPermissions(context,
-                                new String[]{Manifest.permission.READ_CONTACTS},
-                                MY_PERMISSIONS_REQUEST_READ_CONTACTS);
 
-                        // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                        // app-defined int constant. The callback method gets the
-                        // result of the request.
+                        ActivityCompat.requestPermissions(context, new String[]{Manifest.permission.READ_CONTACTS}, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
                     }
-                } else {
-                    // Permission has already been granted
-                    initView();
                 }
 
         }
-    }
+
 
     private void initView() {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS)== PackageManager.PERMISSION_GRANTED)

@@ -1,7 +1,9 @@
 package javeriana.computacionmovil.taller2;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +16,7 @@ public class ContactsAdapter extends CursorAdapter {
     private static final int CONTACT_ID_INDEX = 0;
     private static final int DISPLAY_NAME_INDEX = 1;
 
+
     public ContactsAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
@@ -21,7 +24,7 @@ public class ContactsAdapter extends CursorAdapter {
 
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context) .inflate(R.layout.activity_contactos, parent, false);
+        return LayoutInflater.from(context) .inflate(R.layout.activity_contactos_view, parent, false);
     }
 
     @Override
