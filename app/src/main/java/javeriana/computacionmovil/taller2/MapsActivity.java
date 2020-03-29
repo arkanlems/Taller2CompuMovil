@@ -5,8 +5,13 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -18,11 +23,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+    SensorManager sensorManager;
+    Sensor lightSensor;
+    SensorEventListener lightSensorListener;
 
     private GoogleMap mMap;
     Location currentLocation;
@@ -33,9 +42,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps2);
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+        sensorManager= (SensorManager) getSystemService(SENSOR_SERVICE);
+        lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         fetchLocation();
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
 
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        lightSensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (mMap != null) {
+                    if (event.values[0] < 5000) {
+                        Log.i("MAPS", "DARK MAP " + event.values[0]);
+                       mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this,R.raw.style_json));
+                    } else {
+                        Log.i("MAPS", "LIGHT MAP " + event.values[0]);
+                        mMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(MapsActivity.this,R.raw.style_json_day));
+                    }
+                }
+            }
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+        };
 
 
 
@@ -101,4 +128,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
         }
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(lightSensorListener, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(lightSensorListener);
+    }
+
 }
